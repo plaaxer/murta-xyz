@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Resume</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <p class="label">Visitors</p>
+    <p class="count" id="visitor-count">—</p>
+  </main>
+
+  <script>
+    // Calls the API Gateway endpoint that triggers the Lambda visitor counter.
+    // Replace the URL below with your actual API Gateway invoke URL.
+    const API_URL = "https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com/prod/count";
+
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("visitor-count").textContent = data.count;
+      })
+      .catch(() => {
+        document.getElementById("visitor-count").textContent = "N/A";
+      });
+  </script>
+</body>
+</html>
