@@ -1,27 +1,48 @@
-# main.tf — Root module. Wires together all resources for the cloud resume stack.
-#
-# Resources to define here:
-#   - S3 bucket for static site hosting (index.html, style.css)
-#   - S3 bucket policy to allow public read
-#   - CloudFront distribution in front of the S3 bucket (HTTPS + CDN)
-#   - DynamoDB table to store the visitor counter (partition key: "id")
-#   - Lambda function that reads and increments the DynamoDB counter
-#   - IAM role + policy granting Lambda permission to access DynamoDB
-#   - API Gateway (HTTP API) that exposes the Lambda as a GET /count endpoint
-#   - CORS configuration on API Gateway so the browser can call it
 
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
+# defining region n provider
+provider "aws" {
+  region = "us-east-2"
+}
+
+# visitor counting DynamoDB table
+resource "aws_dynamodb_table" "visitor_counter" {
+  name = "visitor-counter"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
   }
 
-  # TODO: configure remote state backend (S3 + DynamoDB lock) once the bucket exists
-  # backend "s3" { ... }
+  tags = {
+    Project = "Cloud Resume Challenge"
+    Environment = "Production"
+  }
 }
 
-provider "aws" {
-  region = var.aws_region
+# zipping lambda function
+resource "archive_file" "lambda_zip" {
+  type = "zip"
+  source_file = "${path.module}/lambda/lambda_function.py"
+  output_file = "${path.module}/lambda/lambda_function.zip"
 }
+
+# iam role for lambda
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "resume_visitor_counter_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+# todo: finish integrations w role and lambda, delete remote stateless stuff and apply
+
