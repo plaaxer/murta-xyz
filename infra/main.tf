@@ -1,4 +1,14 @@
 
+# remote tf state
+terraform {
+  backend "s3" {
+    bucket = "murta-tf-state-0"
+    key = "challenge/terraform.tf"
+    region = "us-east-2"
+    encrypt = true
+  }
+}
+
 # defining region n provider
 provider "aws" {
   region = "us-east-2"
