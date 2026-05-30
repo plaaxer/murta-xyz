@@ -3,7 +3,6 @@ import os
 import boto3
 
 dynamodb = boto3.resource('dynamodb')
-# Make sure this matches your exact table name
 TABLE_NAME = os.environ.get('TABLE_NAME', 'visitor-counter')
 table = dynamodb.Table(TABLE_NAME)
 
