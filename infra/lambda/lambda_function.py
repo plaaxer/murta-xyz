@@ -1,10 +1,16 @@
 import json
+import logging
 import os
+
 import boto3
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource('dynamodb')
 TABLE_NAME = os.environ.get('TABLE_NAME', 'visitor-counter')
 table = dynamodb.Table(TABLE_NAME)
+
 
 def lambda_handler(event, context):
     try:
@@ -27,8 +33,8 @@ def lambda_handler(event, context):
             'body': json.dumps({'count': latest_count})
         }
         
-    except Exception as e:
-        print(f"Error executing update: {str(e)}")
+    except Exception:
+        logger.exception("Failed to update visitor counter")
         return {
             'statusCode': 500,
             'body': json.dumps({'error': 'Internal Server Error'})

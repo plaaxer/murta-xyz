@@ -6,6 +6,7 @@ on:
     branches: [ master ]
     paths:
       - 'infra/**'
+      - '.github/workflows/backend.yaml'
 
 jobs:
   terraform:
@@ -28,8 +29,22 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
+    - name: Lint Lambda
+      uses: astral-sh/ruff-action@v3
+      with:
+        src: ./infra/lambda
+
+    - name: Check Terraform Formatting
+      run: terraform fmt -check -recursive
+
     - name: Terraform Init
       run: terraform init
 
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+
     - name: Terraform Apply
-      run: terraform apply -auto-approve
+      run: terraform apply -auto-approve tfplan
