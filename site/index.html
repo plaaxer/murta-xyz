@@ -1,28 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Felipe Murta | Plaxer</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Felipe Murta's personal website.">
+  <title>home - murta</title>
+  <link rel="stylesheet" href="personal.css">
 </head>
 <body>
+  <header class="topbar">
+    <a class="site-name" href="index.html">murta.xyz</a>
+    <nav aria-label="Primary navigation">
+      <a class="active" href="index.html">Me</a>
+      <a href="projects.html">Projects</a>
+      <a href="stuff.html">Stuff</a>
+    </nav>
+    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme">theme</button></div>
+  </header>
+
   <main>
-    <p class="label">Visitors</p>
-    <p class="count" id="visitor-count">—</p>
+    <section class="home-intro">
+      <p class="command">/home/felipe</p>
+      <h1>Felipe Murta</h1>
+      <p class="summary">Welcome to my sandbox. Feel free to check my projects or some random posts and tools.</p>
+      <div class="links"><a href="projects.html">See projects →</a><a href="stuff.html">Skip to the unrelated stuff</a></div>
+    </section>
+
+    <section class="home-section">
+      <header class="section-heading"><span>01</span><h2>Recent work</h2><a href="projects.html">All projects</a></header>
+      <div class="records">
+        <article class="record featured">
+          <div class="record-meta"><span>2026</span><span>ACTIVE</span></div>
+          <div><h3>This</h3><p>This site’s infrastructure: static hosting, a serverless visitor counter, Terraform, and continuous deployment. The frontend was cleary vibecoded. The code was *not* reviewed. I said "yes" whenever prompted. Actually not even that, straight up auto-mode, who am I fooling?
+
+            Please do not take this website seriously! I don't.
+          </p></div>
+          <span class="stack">AWS / TF / PY</span>
+        </article>
+        <!-- <article class="record">
+          <div class="record-meta"><span>NEXT</span><span>DESIGNING</span></div>
+          <div><h3>TDEE + steps calculator</h3><p>A daily energy calculator that treats step count separately from other activity.</p></div>
+          <span class="stack">WEB</span>
+        </article> -->
+      </div>
+    </section>
+
+    <section class="home-section elsewhere-preview">
+      <header class="section-heading"><span>02</span><h2>Elsewhere</h2><a href="stuff.html">Open stuff</a></header>
+      <p>Some random stuff and utilities I wanted to put online. My TDEE calculator is actually useful, though I would advise against its usage, as it might reveal that your maintenance is lower than expected, which can be depressing (for most people).</p>
+      <p class="calculator-link"><a href="calculator.html">→ Open the no-multiplier TDEE calculator</a></p>
+      <!-- TODO: restore a current-status list after its entries are filled in.
+      <ul><li>watching / ...</li><li>playing / ...</li><li>supporting / ...</li></ul>
+      -->
+    </section>
   </main>
 
-  <script>
-    const API_URL = "https://hwbqd27i55.execute-api.us-east-2.amazonaws.com/count";
-
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("visitor-count").textContent = data.count;
-      })
-      .catch(() => {
-        document.getElementById("visitor-count").textContent = "N/A";
-      });
-  </script>
+  <footer>
+    <span>Felipe Murta / Brazil</span>
+    <!-- TODO: add a contact address after confirming the public mailbox. -->
+    <a href="index.html">home</a>
+  </footer>
+  <script src="counter.js"></script>
+  <script src="theme.js"></script>
 </body>
 </html>

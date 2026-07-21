@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A transparent TDEE calculator without generic activity multipliers.">
+  <title>TDEE calculator - murta</title>
+  <link rel="stylesheet" href="personal.css">
+  <link rel="stylesheet" href="calculator.css">
+</head>
+<body data-theme-joke>
+  <header class="topbar">
+    <a class="site-name" href="index.html">murta.xyz</a>
+    <nav aria-label="Primary navigation"><a href="index.html">Me</a><a href="projects.html">Projects</a><a class="active" href="stuff.html">Stuff</a></nav>
+    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme">theme</button></div>
+  </header>
+  <nav class="subnav" aria-label="Stuff categories"><a href="calculator.html">TDEE calculator</a></nav>
+
+  <main class="calculator-page">
+    <header class="calculator-intro">
+      <p class="command">/stuff/tdee</p>
+      <h1>No multiplier TDEE</h1>
+      <p>Instead of deciding whether you are “lightly” or “moderately” active, this estimates the parts of daily expenditure separately. Albeit still a model, an arbitrary estimate, should be much more accurate than most TDEE calculators available online.</p>
+    </header>
+
+    <form id="tdee-form">
+      <section class="form-section">
+        <header><span>01</span><div><h2>Body</h2><p>Used to estimate lean mass, BMR, walking distance, and weight-scaled movement cost.</p></div></header>
+        <div class="fields three">
+          <label>Weight <span><input id="weight" type="number" min="30" max="300" step="0.1" value="75" required> kg</span></label>
+          <label>Height <span><input id="height" type="number" min="120" max="230" step="0.1" value="175" required> cm</span></label>
+          <label>Body fat <span><input id="body-fat" type="number" min="3" max="65" step="0.1" value="20" required> %</span></label>
+        </div>
+        <p class="field-note">BMR uses Katch–McArdle: <code>370 + 21.6 × lean mass in kg</code>. Body-fat measurement error flows directly into this estimate.</p>
+      </section>
+
+      <section class="form-section">
+        <header><span>02</span><div><h2>Everyday movement</h2><p>Choose either a transparent step calculation or a phone-reported active-calorie estimate.</p></div></header>
+        <div class="fields two movement-choice">
+          <label>Movement source
+            <select id="movement-mode"><option value="steps" selected>Steps — preferred</option><option value="phone-active">Phone active calories — optional</option></select>
+          </label>
+          <label><span class="field-label">Background NEAT optimism <span class="tooltip" tabindex="0" role="img" aria-label="Background NEAT optimism help" data-tooltip="This is a guess for movement your phone misses: standing, chores, short walks without the phone, and fidgeting. Cautious uses 70% of the base; middle uses 100%; optimistic uses 130%. It is not a personality score—calibrate it from multi-week weight trends.">?</span></span>
+            <select id="optimism"><option value="low">Cautious</option><option value="mid" selected>Middle</option><option value="high">Optimistic</option></select>
+          </label>
+        </div>
+        <div id="step-fields" class="fields two movement-fields">
+          <label>Average daily steps <span><input id="steps" type="number" min="0" max="100000" step="100" value="8000" required> steps</span></label>
+          <label>Measured step length <span><input id="step-length" type="number" min="20" max="150" step="0.1" placeholder="auto"> cm</span></label>
+        </div>
+        <div id="phone-active-field" class="fields one movement-fields" hidden>
+          <label>Phone-reported active calories <span><input id="phone-active" type="number" min="0" max="5000" step="1" value="0" disabled> kcal/day</span></label>
+        </div>
+        <p id="movement-note" class="field-note">If step length is blank, distance uses the rough proxy of 41.4% of height. Measure and enter your own average to remove that assumption. Walking uses a net cost of 0.5 kcal/kg/km. Background NEAT covers standing, dishes, hygiene, fidgeting, and walking without your phone.</p>
+        <p class="warning">The step mode uses no wearable calorie estimate. Phone active calories are an optional fallback, not a trusted measurement: confirm your profile weight is current, use only one movement source, and do not use them if they already include lifting or exercise that you add below. Never put a whole-day wearable total in EAT or lifting.</p>
+      </section>
+
+      <section class="form-section">
+        <header><span>03</span><div><h2>Entered exercise <span class="tooltip" tabindex="0" role="img" aria-label="Entered exercise help" data-tooltip="Enter a conservative daily average for swimming, cycling, running, or tennis using duration/distance or a session-specific wearable estimate. Wearable calories must be active calories only for that exercise session—no resting calories and no whole-day total. Treat them as rough, and do not overlap with your movement source or lifting.">?</span></h2><p>Exercise activity thermogenesis (EAT) that is neither steps nor resistance training.</p></div></header>
+        <div class="fields one"><label>Average calories per day <span><input id="eat" type="number" min="0" max="3000" step="1" value="0" required> kcal</span></label></div>
+        <p class="warning exercise-warning">Use a conservative manual average for running, cycling, swimming, or sport. A wearable estimate is acceptable only when it is active calories for that specific exercise session and duration—not resting calories or a whole-day total. Treat it as rough. Do not double-count activity already covered by your movement source, and do not enter lifting here.</p>
+      </section>
+
+      <section class="form-section">
+        <header><span>04</span><div><h2>Resistance training</h2><p>A conservative session estimate, including a modest allowance for EPOC, averaged over the week.</p></div></header>
+        <div class="fields three">
+          <label>Sessions per week <span><input id="gym-days" type="number" min="0" max="14" step="1" value="3" required> sessions</span></label>
+          <label><span class="field-label">Intensity <span class="tooltip" tabindex="0" role="img" aria-label="Intensity help" data-tooltip="Low: lighter weights and farther from failure. Moderate: around 1–3 reps in reserve. High: low reps in reserve or training to failure.">?</span></span><select id="gym-intensity"><option value="low">Low</option><option value="mid" selected>Moderate</option><option value="high">High</option></select></label>
+          <label><span class="field-label">Volume <span class="tooltip" tabindex="0" role="img" aria-label="Volume help" data-tooltip="Volume means hard working sets. Low is roughly 1–2 sets per exercise; high is roughly 4 or more. This is only a rough classifier.">?</span></span><select id="gym-volume"><option value="low">Low</option><option value="high" selected>High</option></select></label>
+        </div>
+        <p class="field-note">At 75 kg the model starts at 90, 140, or 190 kcal by intensity; applies ×0.8 or ×1.15 for volume; adds 5–15% for EPOC; scales linearly with body weight; and caps the result at 250 kcal/session. This is an explicit heuristic, not a claim that sets and reps predict exact expenditure.</p>
+      </section>
+
+      <section class="form-section">
+        <header><span>05</span><div><h2>Food</h2><p>Thermic effect of food (TEF) changes with intake and macronutrients.</p></div></header>
+        <div class="fields three">
+          <label>Daily intake, low <span><input id="calories-low" type="number" min="500" max="10000" step="10" value="2200" required> kcal</span></label>
+          <label>Daily intake, high <span><input id="calories-high" type="number" min="500" max="10000" step="10" value="2400" required> kcal</span></label>
+          <label>Protein <span><input id="protein" type="number" min="0" max="500" step="1" value="150" required> g</span></label>
+        </div>
+        <label class="macro-toggle"><input id="manual-macros-toggle" type="checkbox"><span>Enter carbohydrate + fat manually</span></label>
+        <div id="manual-macro-fields" class="fields two macro-fields" hidden>
+          <label>Carbohydrate <span><input id="carbs" type="number" min="0" max="1500" step="1" value="0" disabled> g</span></label>
+          <label>Fat <span><input id="fat" type="number" min="0" max="600" step="1" value="0" disabled> g</span></label>
+        </div>
+        <p class="field-note">Protein uses 25% TEF. By default, remaining calories are modeled as 55% carbohydrate and 45% fat, with TEF of 7.5% and 2.5%. Enable manual macros to override that split; any calories not assigned to protein, carbohydrate, or fat are conservatively treated as fat for TEF.</p>
+      </section>
+
+      <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
+      <button type="submit">Calculate breakdown →</button>
+    </form>
+
+    <section id="results" class="results" aria-live="polite" hidden>
+      <header><p class="command">/result</p><h2><span id="tdee-low">—</span>–<span id="tdee-high">—</span> <small>kcal/day</small></h2><p>A modeled range caused by the entered food-intake range (not a confidence interval).</p></header>
+      <dl>
+        <div><dt>BMR</dt><dd id="result-bmr">—</dd></div>
+        <div><dt id="result-movement-label">Steps</dt><dd id="result-steps">—</dd></div>
+        <div><dt>Untracked NEAT</dt><dd id="result-neat">—</dd></div>
+        <div><dt>Entered exercise</dt><dd id="result-eat">—</dd></div>
+        <div><dt>Resistance training</dt><dd id="result-gym">—</dd></div>
+        <div><dt>TEF</dt><dd id="result-tef">—</dd></div>
+      </dl>
+      <figure class="component-chart" aria-labelledby="chart-caption">
+        <div id="component-bar" class="component-bar" role="group" aria-label="TDEE component breakdown">
+          <span id="chart-bmr" class="chart-segment bmr">BMR</span>
+          <span id="chart-movement" class="chart-segment movement">Movement</span>
+          <span id="chart-neat" class="chart-segment neat">NEAT</span>
+          <span id="chart-eat" class="chart-segment eat">EAT</span>
+          <span id="chart-gym" class="chart-segment gym">Gym</span>
+          <span id="chart-tef" class="chart-segment tef">TEF</span>
+        </div>
+        <figcaption id="chart-caption">Share of modeled expenditure. Hover or focus a segment for its kcal/day and percentage.</figcaption>
+      </figure>
+      <p id="result-detail" class="result-detail"></p>
+      <section class="multiplier-comparison" aria-labelledby="multiplier-title">
+        <header><h3 id="multiplier-title">Traditional multiplier comparison</h3><p>These are the generic BMR multipliers used by many calculators. They are shown for reference only as they are generally way too optimistic.</p></header>
+        <dl>
+          <div><dt>Sedentary / ×1.20</dt><dd id="multiplier-sedentary">—</dd></div>
+          <div><dt>Lightly active / ×1.375</dt><dd id="multiplier-light">—</dd></div>
+          <div><dt>Moderately active / ×1.55</dt><dd id="multiplier-moderate">—</dd></div>
+          <div><dt>Very active / ×1.725</dt><dd id="multiplier-very">—</dd></div>
+          <div><dt>Extra active / ×1.90</dt><dd id="multiplier-extra">—</dd></div>
+        </dl>
+      </section>
+    </section>
+
+    <section class="method">
+      <header><span>METHOD</span><h2>How do we calculate it?</h2></header>
+      <div class="method-grid">
+        <article><h3>No activity multiplier</h3><p>The total is BMR + a selected movement source + untracked NEAT + entered non-lifting exercise + weekly averaged lifting + TEF. Each part stays visible.</p></article>
+        <article><h3>Net walking cost</h3><p>Because BMR already includes resting expenditure, the step component uses a conservative net cost rather than adding the full gross cost of walking.</p></article>
+        <article><h3>Lifting is uncertain</h3><p>Resistance sessions vary enormously by exercise, rest, work performed, and individual. EPOC exists but does not justify treating a lifting session as an enormous calorie burn.</p></article>
+        <article><h3>Calibration beats formulas</h3><p>Use the estimate as a starting point. Consistent intake and multi-week body-weight trends are more informative than any calculator or watch.</p></article>
+      </div>
+
+      <div class="model-audit">
+        <header><p>Constant audit</p><p>What the evidence says, what this calculator chooses, and what gets lost.</p></header>
+        <article><h3>BMR / <code>370 + 21.6 × LBM</code></h3><div><p><b>Basis.</b> The Katch–McArdle equation predicts resting expenditure from fat-free mass. The linked clinical analysis states this exact equation.</p><p><b>Nuance.</b> It is more accurately a resting metabolic rate prediction, although calculators commonly label it BMR. A prediction is not indirect calorimetry. Body-fat error changes lean mass and therefore the result; illness, energy restriction, age, and individual physiology can also make measured RMR differ.</p><a href="https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1543263/full">Equation and measured-RMR comparison ↗</a></div></article>
+        <article><h3>Step length / <code>height × 0.414</code></h3><div><p><b>Basis.</b> Height correlates with step length, and the default lands near preferred step lengths in published gait datasets.</p><p><b>Nuance.</b> The coefficient itself is a convenience heuristic, not a universal physiological constant. Speed, leg length, age, terrain, and gait all matter. That is why measured step length can override it.</p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9669008/">Measured gait dataset and individual variation ↗</a></div></article>
+        <article><h3>Walking / <code>0.5 kcal/kg/km</code></h3><div><p><b>Basis.</b> The ACSM level-walking equation assigns 0.1 mL O₂/kg per metre to horizontal movement. Across 1 km, using about 5 kcal per litre O₂, that converts to roughly 0.5 kcal/kg/km above rest.</p><p><b>Nuance.</b> This is net cost because BMR is already included. A clinical statement reports gross walking cost around 1.15 kcal/kg/mile (about 0.71/kg/km). Grade, load, surface, gait, and unusual speeds change cost.</p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9586849/">Clinical practice statement on walking cost ↗</a></div></article>
+        <article><h3>Untracked NEAT / <code>150 × weight/75</code></h3><div><p><b>Basis.</b> NEAT genuinely includes posture, fidgeting, and daily activity outside formal exercise. Research shows very large person-to-person responses.</p><p><b>Choice.</b> The 150 kcal baseline and 0.7/1.0/1.3 optimism settings are not research-derived population averages. They are a deliberately visible estimate for movement missed when people do not carry their phones. Occupation and habits can make them badly wrong; calibrate against multi-week trends.</p><a href="https://pubmed.ncbi.nlm.nih.gov/9880251/">Measured interindividual NEAT variation ↗</a></div></article>
+        <article><h3>Phone active calories / optional</h3><div><p><b>Basis.</b> This is not an equation used by the calculator; it is an opt-in user input that replaces the step-derived movement subtotal.</p><p><b>Nuance.</b> Consumer-device energy estimates vary substantially, and resistance training is a particularly poor use case. In this mode the number is treated as a rough fallback only. It must not include lifting or exercise entered elsewhere, otherwise the total is double-counted. Background NEAT is still added for activity missed without the phone.</p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7509623/">Systematic review of consumer-wearable validity ↗</a></div></article>
+        <article><h3>Lifting / <code>90–190 kcal at 75 kg</code></h3><div><p><b>Basis.</b> Studies using indirect calorimetry report very different costs across protocols. One study measured roughly 124–132 kcal during a session and another 20–25 kcal during the following hour.</p><p><b>Choice.</b> Intensity bases, volume factors, linear body-weight scaling, 5–15% EPOC, and the 250 kcal cap are conservative product decisions—not a validated resistance-training equation. Reviews disagree on which training variables best predict expenditure.</p><p><b>Wearables.</b> They are not assumed to always overestimate: validation studies find both over- and underestimation. The useful conclusion is that resistance-training calorie estimates are unreliable, with reported mean absolute errors ranging roughly 15–57%.</p><a href="https://pubmed.ncbi.nlm.nih.gov/29541117/">Measured session and EPOC ↗</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11393209/">Measurement methods and wearable validity ↗</a></div></article>
+        <article><h3>TEF / <code>25%, 7.5%, 2.5%</code></h3><div><p><b>Basis.</b> These are midpoints within commonly reported ranges: protein about 20–30%, carbohydrate 5–10%, and fat 0–3%.</p><p><b>Choice.</b> By default, the model assigns 55% of non-protein calories to carbohydrate and 45% to fat. Enabling manual macros replaces that split with entered carbohydrate and fat grams. Any unassigned calories are treated conservatively as fat; entering complete macros improves this component.</p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5470183/">Macronutrient-specific TEF review ↗</a></div></article>
+      </div>
+
+      <div class="sources"><p>Further reading</p><ol><li><a href="https://pubmed.ncbi.nlm.nih.gov/31674141/">Meta-analysis: lifting intensity and energy expenditure ↗</a></li><li><a href="https://onlinelibrary.wiley.com/doi/10.1155/2013/825026">Systematic review: resistance variables and EPOC ↗</a></li><li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5133058/">Systematic review of meal composition and thermogenesis ↗</a></li><li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5948631/">Why step-length models need more than height ↗</a></li><li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7509623/">Systematic review of consumer-wearable validity ↗</a></li></ol></div>
+      <p class="disclaimer">For general informational use only. This is not medical or nutrition advice. Don't hold me accountable...</p>
+    </section>
+  </main>
+  <footer><span>Felipe Murta / Brazil</span><a href="stuff.html">all stuff</a><a href="projects.html">back to work →</a></footer>
+  <script src="counter.js"></script>
+  <script src="theme.js"></script>
+  <script src="calculator.js"></script>
+</body>
+</html>
