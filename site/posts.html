@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Posts, questions, and discussions hosted by Felipe Murta.">
+  <title>posts - murta</title>
+  <script src="assets/js/theme-init.js"></script>
+  <link rel="stylesheet" href="assets/css/personal.css">
+  <link rel="stylesheet" href="assets/css/posts.css">
+</head>
+<body data-theme-joke>
+  <header class="topbar">
+    <a class="site-name" href="index.html">murta.xyz</a>
+    <nav aria-label="Primary navigation"><a href="index.html">Me</a><a href="projects.html">Projects</a><a class="active" href="personal.html">Personal</a></nav>
+    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme"></button></div>
+  </header>
+  <nav class="subnav" aria-label="Personal categories"><a class="active" href="posts.html">Posts</a><a href="calculator.html">TDEE calculator</a></nav>
+
+  <main class="posts-page">
+    <section id="posts-index" class="posts-view">
+      <header class="posts-hero">
+        <div><p class="command">/personal/posts</p><h1>Posts</h1><p>Personal rambling spot.</p></div>
+        <dl><div><dt>Threads</dt><dd id="thread-count">—</dd></div><div><dt>Replies</dt><dd id="reply-count">—</dd></div></dl>
+      </header>
+      <div class="posts-toolbar">
+        <label><span>Search discussions</span><input id="posts-search" type="search" placeholder="Try “AWS” or “queues”" autocomplete="off"></label>
+      </div>
+      <section aria-labelledby="discussion-title">
+        <header class="list-heading"><h2 id="discussion-title">Latest discussions</h2><span id="result-count"></span></header>
+        <div id="post-list" class="post-list"></div>
+        <p id="empty-posts" class="empty-state" hidden>No threads match that search. The void remains undefeated.</p>
+      </section>
+    </section>
+
+    <article id="post-view" class="posts-view post-view" hidden>
+      <a class="back-link" href="posts.html">← All posts</a>
+      <header class="post-header"><p id="post-meta" class="status"></p><h1 id="post-title"></h1><p id="post-deck"></p></header>
+      <div id="post-body" class="post-body"></div>
+      <section class="comments" aria-labelledby="comments-title">
+        <header><div><p class="command">/replies</p><h2 id="comments-title">Discussion <span id="comment-count"></span></h2></div><p>Be curious. Disagree with ideas, not people.</p></header>
+        <div id="comment-list" class="comment-list" aria-live="polite"></div>
+        <form id="comment-form" class="comment-form">
+          <h3>Leave a reply</h3>
+          <div class="comment-fields"><label>Name <input name="name" maxlength="40" required placeholder="Your name"></label><label>Email <input name="email" type="email" maxlength="120" required placeholder="Not displayed"></label></div>
+          <label>Comment <textarea name="body" minlength="3" maxlength="2000" required placeholder="Add something useful…"></textarea></label>
+          <label class="honeypot" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+          <div class="form-foot"><p id="comment-status" role="status"></p><button type="submit">Post reply →</button></div>
+        </form>
+      </section>
+    </article>
+
+    <section id="write-view" class="posts-view write-view" hidden>
+      <a class="back-link" href="posts.html">← All posts</a>
+      <header><p class="command">/personal/posts/write</p><h1>Owner desk</h1><p>Publishing requires the owner account. Authorization is enforced by the API, not this page.</p></header>
+      <section id="owner-gate" class="owner-gate"><span>401</span><div><h2>Authentication required</h2><p>Sign in through the private Cognito user pool to create or edit posts.</p><button id="owner-sign-in" type="button">Sign in as Felipe →</button></div></section>
+      <form id="post-editor" class="post-editor" hidden>
+        <div class="editor-fields"><label>Title <input name="title" maxlength="120" required></label><label>Slug <input name="slug" maxlength="100" pattern="[a-z0-9-]+" required></label><label>Summary <textarea name="deck" maxlength="240" required></textarea></label><label>Body <textarea name="body" class="body-editor" required placeholder="Separate paragraphs with a blank line."></textarea></label></div>
+        <div class="form-foot"><p id="editor-status" role="status"></p><button type="submit">Publish thread →</button></div>
+      </form>
+    </section>
+  </main>
+
+  <footer><span>Felipe Murta / Brazil</span><a href="posts.html#write">owner sign-in</a><a href="projects.html">projects →</a></footer>
+  <script src="assets/js/counter.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/posts.js"></script>
+</body>
+</html>

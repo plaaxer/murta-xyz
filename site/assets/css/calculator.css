@@ -33,8 +33,8 @@ input:focus, select:focus { border-color: var(--blue); outline: 1px solid var(--
 .exercise-warning { display: none; }
 code { color: var(--ink); }
 .form-error { grid-column: 1 / -1; min-height: 16px; margin: 12px 0 0; padding-left: 18px; color: #d26b61; font-size: 11px; }
-button { grid-column: 1 / -1; justify-self: start; margin: 0 0 25px 18px; padding: 10px 12px; border: 1px solid var(--ink); border-radius: 0; background: var(--ink); color: var(--bg); font: 10px "Courier New", monospace; text-transform: uppercase; cursor: pointer; }
-button:hover, button:focus-visible { background: var(--blue); border-color: var(--blue); color: #fff; }
+#tdee-form > button { grid-column: 1 / -1; justify-self: start; margin: 0 0 25px 18px; padding: 10px 12px; border: 1px solid var(--ink); border-radius: 0; background: var(--ink); color: var(--bg); font: 10px "Courier New", monospace; text-transform: uppercase; cursor: pointer; }
+#tdee-form > button:hover, #tdee-form > button:focus-visible { background: var(--blue); border-color: var(--blue); color: #fff; }
 
 .results { scroll-margin-top: 70px; margin: 25px 0 70px; border: 1px solid var(--ink); }
 .results > header { padding: 18px; border-bottom: 1px solid var(--ink); }

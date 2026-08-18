@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Personal projects, tools, and assorted internet things by Felipe Murta.">
   <title>personal - murta</title>
+  <script src="assets/js/theme-init.js"></script>
   <link rel="stylesheet" href="assets/css/personal.css">
 </head>
 <body data-theme-joke>
   <header class="topbar">
     <a class="site-name" href="index.html">murta.xyz</a>
     <nav aria-label="Primary navigation"><a href="index.html">Me</a><a href="projects.html">Projects</a><a class="active" href="personal.html">Personal</a></nav>
-    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme">theme</button></div>
+    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme"></button></div>
   </header>
   <nav class="subnav" aria-label="Personal categories">
     <!-- TODO: enable these as their sections are written.
     <a href="#anime">Anime</a>
     <a href="#games">Games</a>
     -->
+    <a href="posts.html">Posts</a>
     <a href="calculator.html">TDEE calculator</a>
     <!--
     <a href="#cruzeiro">Cruzeiro</a>
@@ -27,13 +29,14 @@
   <main>
     <header class="page-intro personal-intro"><p class="command">/personal</p><h1>Personal</h1><p>Things I wanted to put online. They can be useful, usually not though.</p></header>
     <div class="personal-list">
+      <section id="posts" class="featured"><p class="category">01 / POSTS / PRIMARY</p><div><h2>Posts &amp; replies</h2><p>Notes on software, infrastructure, and whatever else seems worth discussing. I start the threads; everyone can reply.</p><a href="posts.html">Read the posts →</a></div></section>
       <!-- TODO: enable when there is real anime content.
       <section id="anime"><p class="category">01 / ANIME</p><div><h2>Watching &amp; reviewing</h2></div></section>
       -->
       <!-- TODO: enable when there is real gaming content.
       <section id="games"><p class="category">02 / GAMES</p><div><h2>Games</h2></div></section>
       -->
-      <section id="tools"><p class="category">01 / TOOLS</p><div><h2>TDEE without activity multipliers</h2><p>A transparent estimate built from body composition, steps, background movement, entered exercise, lifting, and food thermogenesis.</p><a href="calculator.html">Open the calculator →</a></div></section>
+      <section id="tools"><p class="category">02 / TOOLS</p><div><h2>TDEE without activity multipliers</h2><p>A transparent estimate built from body composition, steps, background movement, entered exercise, lifting, and food thermogenesis.</p><a href="calculator.html">Open the calculator →</a></div></section>
       <!-- TODO: enable when there is real Cruzeiro content.
       <section id="cruzeiro" class="cruzeiro"><p class="category">02 / FUTEBOL</p><div><h2>O maior de Minas</h2></div></section>
       -->

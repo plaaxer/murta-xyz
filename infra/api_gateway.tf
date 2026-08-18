@@ -4,8 +4,8 @@ resource "aws_apigatewayv2_api" "counting_api" {
   protocol_type = "HTTP"
   cors_configuration {
     allow_origins = ["https://murta.xyz"]
-    allow_methods = ["GET", "OPTIONS"]
-    allow_headers = ["Content-Type"]
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_headers = ["Authorization", "Content-Type"]
     max_age       = 300
   }
 }

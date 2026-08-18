@@ -6,8 +6,12 @@ const hasThemeJoke = document.body.hasAttribute("data-theme-joke");
 const themeChannel = "BroadcastChannel" in window ? new BroadcastChannel("murta-theme") : null;
 
 function readThemeCookie() {
-  const cookie = document.cookie.split("; ").find((entry) => entry.startsWith(`${themeCookieKey}=`));
-  return cookie ? cookie.split("=")[1] : null;
+  try {
+    const cookie = document.cookie.split("; ").find((entry) => entry.startsWith(`${themeCookieKey}=`));
+    return cookie ? cookie.split("=")[1] : null;
+  } catch {
+    return null;
+  }
 }
 
 function savedTheme() {
@@ -27,24 +31,9 @@ function systemTheme() {
 }
 
 function updateButton(theme) {
-  themeButton.textContent = theme === "dark" ? "light mode" : "dark mode";
-  themeButton.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
-}
-
-function setTheme(theme, persist = false) {
-  document.documentElement.dataset.theme = theme;
-  updateButton(theme);
-
-  if (persist) {
-    try {
-      localStorage.setItem(themeStorageKey, theme);
-    } catch {
-      // Cookie persistence still works in many restrictive preview contexts.
-    }
-
-    document.cookie = `${themeCookieKey}=${theme}; max-age=31536000; path=/; SameSite=Lax`;
-    themeChannel?.postMessage(theme);
-  }
+  const targetTheme = theme === "dark" ? "light" : "dark";
+  themeButton.title = `Switch to ${targetTheme} mode`;
+  themeButton.setAttribute("aria-label", `Switch to ${targetTheme} mode`);
 }
 
 function warningWasShown() {
@@ -59,42 +48,76 @@ function rememberWarning() {
   try {
     sessionStorage.setItem(lightWarningKey, "true");
   } catch {
-    // The joke still works without session persistence.
+    // The warning still works without session persistence.
   }
 }
 
 function showLightModeDialog(allowLight) {
+  document.querySelector(".theme-dialog")?.remove();
   const dialog = document.createElement("dialog");
   dialog.className = "theme-dialog";
-  dialog.innerHTML = allowLight
-    ? "<section><h2>if you want it that much just tell us....</h2><p>This website is not appropriate for it though lol</p><button type=\"button\">turn on light mode</button></section>"
-    : "<section><h2>tf are you doing? who uses light mode in 2026?</h2><p>We’ll assume you misclicked.</p><button type=\"button\">lol my bad</button></section>";
+  const section = document.createElement("section");
+  const heading = document.createElement("h2");
+  const copy = document.createElement("p");
+  const confirmButton = document.createElement("button");
+  confirmButton.type = "button";
 
-  const confirmButton = dialog.querySelector("button");
-  confirmButton.addEventListener("click", () => {
+  heading.textContent = allowLight ? "if you want it that much just tell us...." : "tf are you doing? who uses light mode in 2026?";
+  copy.textContent = allowLight ? "This website is not appropriate for it though lol" : "We’ll assume you misclicked.";
+  confirmButton.textContent = allowLight ? "turn on light mode" : "lol my bad";
+  section.append(heading, copy, confirmButton);
+  dialog.append(section);
+
+  function closeDialog() {
     dialog.close();
     dialog.remove();
+    updateButton(document.documentElement.dataset.theme);
+  }
+
+  confirmButton.addEventListener("click", () => {
     if (allowLight) setTheme("light", true);
+    closeDialog();
   });
-  dialog.addEventListener("cancel", (event) => event.preventDefault());
+  dialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeDialog();
+  });
   document.body.append(dialog);
   dialog.showModal();
   confirmButton.focus();
 }
 
+function setTheme(theme, persist = false) {
+  document.documentElement.dataset.theme = theme;
+  updateButton(theme);
+
+  if (persist) {
+    try {
+      localStorage.setItem(themeStorageKey, theme);
+    } catch {
+      // Cookie persistence still works in many restrictive preview contexts.
+    }
+
+    try {
+      document.cookie = `${themeCookieKey}=${theme}; max-age=31536000; path=/; SameSite=Lax`;
+    } catch {
+      // localStorage remains the primary persistence mechanism.
+    }
+    themeChannel?.postMessage(theme);
+  }
+}
+
 if (themeButton) {
-  setTheme(savedTheme() || systemTheme());
+  setTheme(document.documentElement.dataset.theme || savedTheme() || systemTheme());
 
   themeButton.addEventListener("click", () => {
     const current = document.documentElement.dataset.theme;
-
     if (current === "dark" && hasThemeJoke) {
       const hasSeenWarning = warningWasShown();
       if (!hasSeenWarning) rememberWarning();
       showLightModeDialog(hasSeenWarning);
       return;
     }
-
     setTheme(current === "dark" ? "light" : "dark", true);
   });
 
@@ -109,4 +132,8 @@ if (themeButton) {
       if (event.data === "dark" || event.data === "light") setTheme(event.data);
     });
   }
+
+  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
+    if (!savedTheme()) setTheme(event.matches ? "light" : "dark");
+  });
 }
