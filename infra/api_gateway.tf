@@ -30,6 +30,12 @@ resource "aws_apigatewayv2_stage" "default_stage" {
   api_id      = aws_apigatewayv2_api.counting_api.id
   name        = "$default"
   auto_deploy = true
+
+  route_settings {
+    route_key              = "POST /posts/{slug}/comments"
+    throttling_rate_limit  = 1
+    throttling_burst_limit = 3
+  }
 }
 
 # permission to execute
