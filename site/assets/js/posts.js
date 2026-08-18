@@ -115,17 +115,21 @@ function formatDate(value) {
 
 function allComments(post) { return post.comments || []; }
 
+function makeTag(tag) {
+  const item = document.createElement("li");
+  item.textContent = tag;
+  return item;
+}
+
 function renderStats() {
   document.querySelector("#thread-count").textContent = posts.length;
   document.querySelector("#reply-count").textContent = posts.reduce((sum, post) => sum + allComments(post).length, 0);
 }
 
 function renderPosts() {
-  const query = document.querySelector("#posts-search").value.trim().toLowerCase();
-  const filtered = posts.filter((post) => `${post.title} ${post.deck}`.toLowerCase().includes(query));
   const list = document.querySelector("#post-list");
   list.replaceChildren();
-  filtered.forEach((post, index) => {
+  posts.forEach((post, index) => {
     const card = document.createElement("article");
     card.className = "post-card";
     const number = document.createElement("span");
@@ -134,15 +138,13 @@ function renderPosts() {
     const content = document.createElement("div");
     const meta = document.createElement("p");
     meta.className = "status";
-    meta.textContent = formatDate(post.publishedAt);
+    meta.textContent = [formatDate(post.publishedAt), ...(post.tags || [])].join(" / ");
     const title = document.createElement("h3");
     const link = document.createElement("a");
     link.href = `#post/${post.slug}`;
     link.textContent = post.title;
     title.append(link);
-    const deck = document.createElement("p");
-    deck.textContent = post.deck;
-    content.append(meta, title, deck);
+    content.append(meta, title);
     const stats = document.createElement("div");
     stats.className = "post-stats";
     const count = allComments(post).length;
@@ -150,10 +152,9 @@ function renderPosts() {
     card.append(number, content, stats);
     list.append(card);
   });
-  document.querySelector("#result-count").textContent = `${filtered.length} / ${posts.length}`;
   const empty = document.querySelector("#empty-posts");
-  empty.textContent = loadError ? "Posts could not be loaded. Please try again later." : posts.length ? "No posts match that search." : "No posts published yet.";
-  empty.hidden = filtered.length !== 0;
+  empty.textContent = loadError ? "Posts could not be loaded. Please try again later." : "No posts published yet.";
+  empty.hidden = posts.length !== 0;
 }
 
 function renderComments(post) {
@@ -191,7 +192,7 @@ function renderPost(post) {
   document.title = `${post.title} - murta`;
   document.querySelector("#post-meta").textContent = `POSTED ${formatDate(post.publishedAt)} / FELIPE MURTA`;
   document.querySelector("#post-title").textContent = post.title;
-  document.querySelector("#post-deck").textContent = post.deck;
+  document.querySelector("#post-tags").replaceChildren(...(post.tags || []).map(makeTag));
   const body = document.querySelector("#post-body");
   body.replaceChildren(...post.body.map((paragraph) => {
     const element = document.createElement("p");
@@ -215,7 +216,6 @@ function route() {
   renderPosts();
 }
 
-document.querySelector("#posts-search").addEventListener("input", renderPosts);
 document.querySelector("#comment-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
@@ -256,8 +256,7 @@ document.querySelector("#post-editor").addEventListener("submit", async (event) 
   }
   const post = {
     title: data.get("title").trim(),
-    slug: data.get("slug").trim(),
-    deck: data.get("deck").trim(),
+    tags: data.get("tags").split(",").map((tag) => tag.trim()).filter(Boolean),
     body: data.get("body").split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean),
   };
   status.textContent = "Publishing…";

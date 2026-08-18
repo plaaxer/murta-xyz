@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import re
+import unicodedata
 import uuid
 from datetime import datetime, timezone
 
@@ -13,7 +14,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 table = boto3.resource("dynamodb").Table(os.environ["TABLE_NAME"])
-SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def response(status_code, body):
@@ -41,6 +41,36 @@ def clean_text(value, field, minimum, maximum):
     if not minimum <= len(value) <= maximum:
         raise ValueError(f"{field} must contain {minimum}-{maximum} characters")
     return value
+
+
+def slug_from_title(title):
+    normalized = (
+        unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode("ascii")
+    )
+    slug = (
+        re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")[:100].rstrip("-")
+    )
+    if not slug:
+        raise ValueError("title must contain letters or numbers that can form a URL")
+    return slug
+
+
+def clean_tags(value):
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise TypeError("tags must be a list")
+    if len(value) > 10:
+        raise ValueError("tags cannot contain more than 10 entries")
+    tags = []
+    normalized_tags = set()
+    for tag in value:
+        cleaned = clean_text(tag, "tag", 1, 30)
+        normalized = cleaned.casefold()
+        if normalized not in normalized_tags:
+            tags.append(cleaned)
+            normalized_tags.add(normalized)
+    return tags
 
 
 def public_comment(item):
@@ -75,7 +105,7 @@ def list_posts():
             {
                 "slug": item["slug"],
                 "title": item["title"],
-                "deck": item["deck"],
+                "tags": item.get("tags", []),
                 "body": item["body"],
                 "publishedAt": item["publishedAt"],
                 "comments": comments_for(item["slug"]),
@@ -87,21 +117,24 @@ def list_posts():
 
 def create_post(event):
     body = request_body(event)
-    slug = clean_text(body.get("slug"), "slug", 1, 100).lower()
-    if not SLUG_PATTERN.fullmatch(slug):
-        raise ValueError("slug can contain only lowercase letters, numbers, and hyphens")
+    title = clean_text(body.get("title"), "title", 1, 120)
+    slug = slug_from_title(title)
 
     paragraphs = body.get("body")
-    if not isinstance(paragraphs, list) or not paragraphs:
+    if not isinstance(paragraphs, list):
+        raise TypeError("body must be a list of paragraphs")
+    if not paragraphs:
         raise ValueError("body must contain at least one paragraph")
-    paragraphs = [clean_text(paragraph, "paragraph", 1, 10000) for paragraph in paragraphs]
+    paragraphs = [
+        clean_text(paragraph, "paragraph", 1, 10000) for paragraph in paragraphs
+    ]
     published_at = datetime.now(timezone.utc).isoformat()
     item = {
         "PK": f"POST#{slug}",
         "SK": "POST",
         "slug": slug,
-        "title": clean_text(body.get("title"), "title", 1, 120),
-        "deck": clean_text(body.get("deck"), "deck", 1, 240),
+        "title": title,
+        "tags": clean_tags(body.get("tags")),
         "body": paragraphs,
         "publishedAt": published_at,
     }
@@ -116,7 +149,7 @@ def create_post(event):
         {
             "slug": slug,
             "title": item["title"],
-            "deck": item["deck"],
+            "tags": item["tags"],
             "body": paragraphs,
             "publishedAt": published_at,
             "comments": [],

@@ -23,19 +23,16 @@
         <div><p class="command">/personal/posts</p><h1>Posts</h1><p>Personal rambling spot.</p></div>
         <dl><div><dt>Threads</dt><dd id="thread-count">—</dd></div><div><dt>Replies</dt><dd id="reply-count">—</dd></div></dl>
       </header>
-      <div class="posts-toolbar">
-        <label><span>Search discussions</span><input id="posts-search" type="search" placeholder="Try “AWS” or “queues”" autocomplete="off"></label>
-      </div>
       <section aria-labelledby="discussion-title">
-        <header class="list-heading"><h2 id="discussion-title">Latest discussions</h2><span id="result-count"></span></header>
+        <header class="list-heading"><h2 id="discussion-title">Latest discussions</h2></header>
         <div id="post-list" class="post-list"></div>
-        <p id="empty-posts" class="empty-state" hidden>No threads match that search. The void remains undefeated.</p>
+        <p id="empty-posts" class="empty-state" hidden>No posts published yet.</p>
       </section>
     </section>
 
     <article id="post-view" class="posts-view post-view" hidden>
       <a class="back-link" href="posts.html">← All posts</a>
-      <header class="post-header"><p id="post-meta" class="status"></p><h1 id="post-title"></h1><p id="post-deck"></p></header>
+      <header class="post-header"><p id="post-meta" class="status"></p><h1 id="post-title"></h1><ul id="post-tags" class="tags"></ul></header>
       <div id="post-body" class="post-body"></div>
       <section class="comments" aria-labelledby="comments-title">
         <header><div><p class="command">/replies</p><h2 id="comments-title">Discussion <span id="comment-count"></span></h2></div><p>Be curious. Disagree with ideas, not people.</p></header>
@@ -55,13 +52,13 @@
       <header><p class="command">/personal/posts/write</p><h1>Owner desk</h1><p>Publishing requires the owner account. Authorization is enforced by the API, not this page.</p></header>
       <section id="owner-gate" class="owner-gate"><span>401</span><div><h2>Authentication required</h2><p>Sign in through the private Cognito user pool to create or edit posts.</p><button id="owner-sign-in" type="button">Sign in as Felipe →</button></div></section>
       <form id="post-editor" class="post-editor" hidden>
-        <div class="editor-fields"><label>Title <input name="title" maxlength="120" required></label><label>Slug <input name="slug" maxlength="100" pattern="[a-z0-9-]+" required></label><label>Summary <textarea name="deck" maxlength="240" required></textarea></label><label>Body <textarea name="body" class="body-editor" required placeholder="Separate paragraphs with a blank line."></textarea></label></div>
+        <div class="editor-fields"><label>Title <input name="title" maxlength="120" required></label><label>Tags <input name="tags" maxlength="200" placeholder="AWS, infrastructure, notes"></label><label>Body <textarea name="body" class="body-editor" required placeholder="Separate paragraphs with a blank line."></textarea></label></div>
         <div class="form-foot"><p id="editor-status" role="status"></p><button type="submit">Publish thread →</button></div>
       </form>
     </section>
   </main>
 
-  <footer><span>Felipe Murta / Brazil</span><a href="posts.html#write">owner sign-in</a><a href="projects.html">projects →</a></footer>
+  <footer><span>Felipe Murta / Brazil</span><a href="posts.html#write">sign-in</a><a href="projects.html">projects →</a></footer>
   <script src="assets/js/counter.js"></script>
   <script src="assets/js/theme.js"></script>
   <script src="assets/js/config.js"></script>
