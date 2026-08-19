@@ -32,7 +32,11 @@
 
     <article id="post-view" class="posts-view post-view" hidden>
       <a class="back-link" href="posts.html">← All posts</a>
-      <header class="post-header"><p id="post-meta" class="status"></p><h1 id="post-title"></h1><ul id="post-tags" class="tags"></ul><button id="delete-post" class="delete-control" type="button" hidden>Delete post</button></header>
+      <header class="post-header"><p id="post-meta" class="status"></p><h1 id="post-title"></h1><ul id="post-tags" class="tags"></ul><div id="post-owner-controls" class="post-owner-controls" hidden><button id="edit-post" class="owner-control" type="button">Edit post</button><button id="delete-post" class="owner-control delete-control" type="button">Delete post</button></div></header>
+      <form id="post-edit-form" class="post-editor post-edit-form" hidden>
+        <div class="editor-fields"><label>Title <input name="title" maxlength="120" required></label><label>Tags <input name="tags" maxlength="200" placeholder="AWS, infrastructure, notes"></label><label>Body <textarea name="body" class="body-editor" required></textarea></label></div>
+        <div class="form-foot"><p id="edit-status" role="status"></p><div class="edit-actions"><button id="cancel-edit" type="button">Cancel</button><button type="submit">Save changes →</button></div></div>
+      </form>
       <div id="post-body" class="post-body"></div>
       <section class="comments" aria-labelledby="comments-title">
         <header><div><p class="command">/replies</p><h2 id="comments-title">Discussion <span id="comment-count"></span></h2></div></header>

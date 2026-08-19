@@ -157,6 +157,53 @@ def create_post(event):
     )
 
 
+def update_post(event, slug):
+    body = request_body(event)
+    title = clean_text(body.get("title"), "title", 1, 120)
+    paragraphs = body.get("body")
+    if not isinstance(paragraphs, list):
+        raise TypeError("body must be a list of paragraphs")
+    if not paragraphs:
+        raise ValueError("body must contain at least one paragraph")
+    paragraphs = [
+        clean_text(paragraph, "paragraph", 1, 10000) for paragraph in paragraphs
+    ]
+    tags = clean_tags(body.get("tags"))
+    try:
+        result = table.update_item(
+            Key={"PK": f"POST#{slug}", "SK": "POST"},
+            UpdateExpression="SET #title = :title, #tags = :tags, #body = :body",
+            ExpressionAttributeNames={
+                "#title": "title",
+                "#tags": "tags",
+                "#body": "body",
+            },
+            ExpressionAttributeValues={
+                ":title": title,
+                ":tags": tags,
+                ":body": paragraphs,
+            },
+            ConditionExpression="attribute_exists(PK)",
+            ReturnValues="ALL_NEW",
+        )
+    except ClientError as error:
+        if error.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            return response(404, {"error": "Post not found"})
+        raise
+    item = result["Attributes"]
+    return response(
+        200,
+        {
+            "slug": item["slug"],
+            "title": item["title"],
+            "tags": item.get("tags", []),
+            "body": item["body"],
+            "publishedAt": item["publishedAt"],
+            "comments": comments_for(slug),
+        },
+    )
+
+
 def create_comment(event, slug):
     existing = table.get_item(Key={"PK": f"POST#{slug}", "SK": "POST"}).get("Item")
     if not existing:
@@ -230,6 +277,8 @@ def lambda_handler(event, context):
         if method == "POST" and path.endswith("/comments"):
             slug = event.get("pathParameters", {}).get("slug", "")
             return create_comment(event, slug)
+        if method == "PUT" and path.startswith("/posts/"):
+            return update_post(event, parameters.get("slug", ""))
         if method == "DELETE" and parameters.get("commentId"):
             return delete_comment(parameters.get("slug", ""), parameters.get("commentId", ""))
         if method == "DELETE" and path.startswith("/posts/"):

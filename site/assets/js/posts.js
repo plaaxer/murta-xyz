@@ -198,7 +198,8 @@ function renderPost(post) {
   document.querySelector("#post-meta").textContent = `POSTED ${formatDate(post.publishedAt)} / FELIPE MURTA`;
   document.querySelector("#post-title").textContent = post.title;
   document.querySelector("#post-tags").replaceChildren(...(post.tags || []).map(makeTag));
-  document.querySelector("#delete-post").hidden = !readTokens();
+  document.querySelector("#post-owner-controls").hidden = !readTokens();
+  document.querySelector("#post-edit-form").hidden = true;
   const body = document.querySelector("#post-body");
   body.replaceChildren(...post.body.map((paragraph) => {
     const element = document.createElement("p");
@@ -218,6 +219,55 @@ async function authenticatedDelete(path) {
   });
   if (!response.ok) throw new Error(await apiError(response, "Delete failed"));
 }
+
+function postPayload(form) {
+  const data = new FormData(form);
+  return {
+    title: data.get("title").trim(),
+    tags: data.get("tags").split(",").map((tag) => tag.trim()).filter(Boolean),
+    body: data.get("body").split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean),
+  };
+}
+
+document.querySelector("#edit-post").addEventListener("click", () => {
+  if (!activePost) return;
+  const form = document.querySelector("#post-edit-form");
+  form.elements.title.value = activePost.title;
+  form.elements.tags.value = (activePost.tags || []).join(", ");
+  form.elements.body.value = activePost.body.join("\n\n");
+  form.hidden = false;
+  form.elements.title.focus();
+});
+
+document.querySelector("#cancel-edit").addEventListener("click", () => {
+  document.querySelector("#post-edit-form").hidden = true;
+  document.querySelector("#edit-status").textContent = "";
+});
+
+document.querySelector("#post-edit-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!activePost) return;
+  const form = event.currentTarget;
+  const status = document.querySelector("#edit-status");
+  const tokens = readTokens();
+  if (!tokens) { status.textContent = "Your owner session expired. Please sign in again."; return; }
+  status.textContent = "Saving…";
+  try {
+    const response = await fetch(`${POSTS_API_URL}/posts/${encodeURIComponent(activePost.slug)}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${tokens.access_token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(postPayload(form)),
+    });
+    if (!response.ok) throw new Error(await apiError(response, "Post could not be updated"));
+    const savedPost = await response.json();
+    const index = posts.findIndex((post) => post.slug === savedPost.slug);
+    if (index !== -1) posts[index] = savedPost;
+    status.textContent = "Saved.";
+    renderPost(savedPost);
+  } catch (error) {
+    status.textContent = error.message;
+  }
+});
 
 async function deleteComment(post, comment) {
   if (!confirm(`Delete ${comment.name}'s reply? This cannot be undone.`)) return;
@@ -292,18 +342,13 @@ document.querySelector("#owner-sign-in").addEventListener("click", async () => {
 document.querySelector("#post-editor").addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
-  const data = new FormData(form);
   const status = document.querySelector("#editor-status");
   const tokens = readTokens();
   if (!tokens) {
     renderOwnerState("Your owner session expired. Please sign in again.");
     return;
   }
-  const post = {
-    title: data.get("title").trim(),
-    tags: data.get("tags").split(",").map((tag) => tag.trim()).filter(Boolean),
-    body: data.get("body").split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean),
-  };
+  const post = postPayload(form);
   status.textContent = "Publishing…";
   try {
     const response = await fetch(`${POSTS_API_URL}/posts`, {

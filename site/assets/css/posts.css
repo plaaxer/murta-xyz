@@ -26,9 +26,17 @@
 .back-link { display: inline-block; margin: 28px 0; color: var(--muted); font-size: 9px; text-transform: uppercase; }
 .post-header { max-width: 880px; padding: 30px 0 42px; }
 .post-header h1 { font-size: clamp(35px, 6vw, 72px); }
+.post-owner-controls { display: flex; gap: 16px; margin-top: 20px; }
+.post-owner-controls[hidden] { display: none; }
+.owner-control { padding: 0; border: 0; background: transparent; color: var(--muted); font: 9px "Courier New", monospace; text-decoration: underline; text-transform: uppercase; cursor: pointer; }
 .delete-control { margin-top: 20px; padding: 0; border: 0; background: transparent; color: var(--muted); font: 9px "Courier New", monospace; text-decoration: underline; text-transform: uppercase; cursor: pointer; }
+.post-owner-controls .delete-control { margin-top: 0; }
+.owner-control:hover, .owner-control:focus-visible { color: var(--blue); }
 .delete-control:hover, .delete-control:focus-visible { color: #c43b32; }
 .delete-control[hidden] { display: none; }
+.post-edit-form { padding-top: 0; border-bottom: 1px solid var(--rule); }
+.edit-actions { display: flex; gap: 8px; }
+.edit-actions #cancel-edit { border-color: var(--rule); background: transparent; color: var(--ink); }
 .post-body { max-width: 760px; padding: 8px 0 60px; color: var(--body-copy); }
 .post-body p { margin: 0 0 22px; font: 14px/1.8 Georgia, serif; }
 .post-body h2 { margin: 44px 0 16px; font: 400 22px "Courier New", monospace; letter-spacing: -.04em; }
