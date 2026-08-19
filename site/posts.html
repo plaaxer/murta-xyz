@@ -32,10 +32,10 @@
 
     <article id="post-view" class="posts-view post-view" hidden>
       <a class="back-link" href="posts.html">← All posts</a>
-      <header class="post-header"><p id="post-meta" class="status"></p><h1 id="post-title"></h1><ul id="post-tags" class="tags"></ul></header>
+      <header class="post-header"><p id="post-meta" class="status"></p><h1 id="post-title"></h1><ul id="post-tags" class="tags"></ul><button id="delete-post" class="delete-control" type="button" hidden>Delete post</button></header>
       <div id="post-body" class="post-body"></div>
       <section class="comments" aria-labelledby="comments-title">
-        <header><div><p class="command">/replies</p><h2 id="comments-title">Discussion <span id="comment-count"></span></h2></div><p>Be curious. Disagree with ideas, not people.</p></header>
+        <header><div><p class="command">/replies</p><h2 id="comments-title">Discussion <span id="comment-count"></span></h2></div></header>
         <div id="comment-list" class="comment-list" aria-live="polite"></div>
         <form id="comment-form" class="comment-form">
           <h3>Leave a reply</h3>

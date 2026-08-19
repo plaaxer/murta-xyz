@@ -178,10 +178,50 @@ def create_comment(event, slug):
     return response(201, public_comment(item))
 
 
+def delete_post(slug):
+    partition_key = f"POST#{slug}"
+    result = table.query(KeyConditionExpression=Key("PK").eq(partition_key))
+    items = result.get("Items", [])
+    while "LastEvaluatedKey" in result:
+        result = table.query(
+            KeyConditionExpression=Key("PK").eq(partition_key),
+            ExclusiveStartKey=result["LastEvaluatedKey"],
+        )
+        items.extend(result.get("Items", []))
+    if not any(item["SK"] == "POST" for item in items):
+        return response(404, {"error": "Post not found"})
+    with table.batch_writer() as batch:
+        for item in items:
+            batch.delete_item(Key={"PK": item["PK"], "SK": item["SK"]})
+    return response(200, {"deleted": slug})
+
+
+def delete_comment(slug, comment_id):
+    partition_key = f"POST#{slug}"
+    result = table.query(
+        KeyConditionExpression=Key("PK").eq(partition_key)
+        & Key("SK").begins_with("COMMENT#")
+    )
+    comments = result.get("Items", [])
+    while "LastEvaluatedKey" in result:
+        result = table.query(
+            KeyConditionExpression=Key("PK").eq(partition_key)
+            & Key("SK").begins_with("COMMENT#"),
+            ExclusiveStartKey=result["LastEvaluatedKey"],
+        )
+        comments.extend(result.get("Items", []))
+    comment = next((item for item in comments if item.get("id") == comment_id), None)
+    if not comment:
+        return response(404, {"error": "Comment not found"})
+    table.delete_item(Key={"PK": comment["PK"], "SK": comment["SK"]})
+    return response(200, {"deleted": comment_id})
+
+
 def lambda_handler(event, context):
     del context
     method = event.get("requestContext", {}).get("http", {}).get("method")
     path = event.get("rawPath", "")
+    parameters = event.get("pathParameters", {})
     try:
         if method == "GET" and path == "/posts":
             return list_posts()
@@ -190,6 +230,10 @@ def lambda_handler(event, context):
         if method == "POST" and path.endswith("/comments"):
             slug = event.get("pathParameters", {}).get("slug", "")
             return create_comment(event, slug)
+        if method == "DELETE" and parameters.get("commentId"):
+            return delete_comment(parameters.get("slug", ""), parameters.get("commentId", ""))
+        if method == "DELETE" and path.startswith("/posts/"):
+            return delete_post(parameters.get("slug", ""))
         return response(404, {"error": "Not found"})
     except (TypeError, ValueError) as error:
         return response(400, {"error": str(error)})

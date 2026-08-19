@@ -56,6 +56,8 @@ resource "aws_iam_role_policy" "posts_dynamodb_access" {
       Action = [
         "dynamodb:GetItem",
         "dynamodb:PutItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:BatchWriteItem",
         "dynamodb:Query",
         "dynamodb:Scan"
       ]
@@ -122,6 +124,24 @@ resource "aws_apigatewayv2_route" "create_comment" {
   api_id    = aws_apigatewayv2_api.counting_api.id
   route_key = "POST /posts/{slug}/comments"
   target    = "integrations/${aws_apigatewayv2_integration.posts.id}"
+}
+
+resource "aws_apigatewayv2_route" "delete_post" {
+  api_id               = aws_apigatewayv2_api.counting_api.id
+  route_key            = "DELETE /posts/{slug}"
+  target               = "integrations/${aws_apigatewayv2_integration.posts.id}"
+  authorization_type   = "JWT"
+  authorizer_id        = aws_apigatewayv2_authorizer.cognito.id
+  authorization_scopes = ["openid"]
+}
+
+resource "aws_apigatewayv2_route" "delete_comment" {
+  api_id               = aws_apigatewayv2_api.counting_api.id
+  route_key            = "DELETE /posts/{slug}/comments/{commentId}"
+  target               = "integrations/${aws_apigatewayv2_integration.posts.id}"
+  authorization_type   = "JWT"
+  authorizer_id        = aws_apigatewayv2_authorizer.cognito.id
+  authorization_scopes = ["openid"]
 }
 
 resource "aws_lambda_permission" "posts_api_invoke" {

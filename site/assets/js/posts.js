@@ -129,12 +129,9 @@ function renderStats() {
 function renderPosts() {
   const list = document.querySelector("#post-list");
   list.replaceChildren();
-  posts.forEach((post, index) => {
+  posts.forEach((post) => {
     const card = document.createElement("article");
     card.className = "post-card";
-    const number = document.createElement("span");
-    number.className = "post-number";
-    number.textContent = String(index + 1).padStart(3, "0");
     const content = document.createElement("div");
     const meta = document.createElement("p");
     meta.className = "status";
@@ -149,7 +146,7 @@ function renderPosts() {
     stats.className = "post-stats";
     const count = allComments(post).length;
     stats.innerHTML = `<b>${count}</b>${count === 1 ? "reply" : "replies"}`;
-    card.append(number, content, stats);
+    card.append(content, stats);
     list.append(card);
   });
   const empty = document.querySelector("#empty-posts");
@@ -169,17 +166,25 @@ function renderComments(post) {
     list.append(empty);
     return;
   }
-  comments.forEach((comment, index) => {
+  comments.forEach((comment) => {
     const article = document.createElement("article");
     article.className = "comment";
     const meta = document.createElement("div");
     meta.className = "comment-meta";
     const author = document.createElement("b");
-    author.textContent = `${String(index + 1).padStart(2, "0")} / ${comment.name}`;
+    author.textContent = comment.name;
     const time = document.createElement("time");
     time.dateTime = comment.createdAt;
     time.textContent = formatDate(comment.createdAt);
     meta.append(author, time);
+    if (readTokens()) {
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "delete-control";
+      deleteButton.type = "button";
+      deleteButton.textContent = "Delete reply";
+      deleteButton.addEventListener("click", () => deleteComment(post, comment));
+      meta.append(deleteButton);
+    }
     const body = document.createElement("p");
     body.textContent = comment.body;
     article.append(meta, body);
@@ -193,6 +198,7 @@ function renderPost(post) {
   document.querySelector("#post-meta").textContent = `POSTED ${formatDate(post.publishedAt)} / FELIPE MURTA`;
   document.querySelector("#post-title").textContent = post.title;
   document.querySelector("#post-tags").replaceChildren(...(post.tags || []).map(makeTag));
+  document.querySelector("#delete-post").hidden = !readTokens();
   const body = document.querySelector("#post-body");
   body.replaceChildren(...post.body.map((paragraph) => {
     const element = document.createElement("p");
@@ -202,6 +208,45 @@ function renderPost(post) {
   renderComments(post);
   showView(postView);
 }
+
+async function authenticatedDelete(path) {
+  const tokens = readTokens();
+  if (!tokens) throw new Error("Your owner session expired. Please sign in again.");
+  const response = await fetch(`${POSTS_API_URL}${path}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${tokens.access_token}` },
+  });
+  if (!response.ok) throw new Error(await apiError(response, "Delete failed"));
+}
+
+async function deleteComment(post, comment) {
+  if (!confirm(`Delete ${comment.name}'s reply? This cannot be undone.`)) return;
+  const status = document.querySelector("#comment-status");
+  try {
+    await authenticatedDelete(`/posts/${encodeURIComponent(post.slug)}/comments/${encodeURIComponent(comment.id)}`);
+    post.comments = allComments(post).filter((item) => item.id !== comment.id);
+    renderComments(post);
+    renderStats();
+    status.textContent = "Reply deleted.";
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
+
+document.querySelector("#delete-post").addEventListener("click", async () => {
+  if (!activePost || !confirm(`Delete “${activePost.title}” and all of its replies? This cannot be undone.`)) return;
+  const button = document.querySelector("#delete-post");
+  button.disabled = true;
+  try {
+    await authenticatedDelete(`/posts/${encodeURIComponent(activePost.slug)}`);
+    posts = posts.filter((post) => post.slug !== activePost.slug);
+    activePost = null;
+    location.hash = "";
+  } catch (error) {
+    alert(error.message);
+    button.disabled = false;
+  }
+});
 
 function route() {
   const routeValue = location.hash.slice(1);

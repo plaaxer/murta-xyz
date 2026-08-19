@@ -60,8 +60,8 @@ main { max-width: none; margin: 0; padding: 0 clamp(14px, 3vw, 48px); }
 .me-block div > p { max-width: 590px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .text-link { display: inline-block; margin-top: 17px; color: var(--ink); font-size: 10px; }
 .page-intro > p:last-child { margin-top: 22px; }
-.project-list article { display: grid; grid-template-columns: 55px 1fr 125px; gap: 20px; min-height: 0; padding: 24px 0; border-bottom: 1px solid var(--rule); }
-.project-id, .project-list article > a, .project-list article > span:last-child { font-size: 9px; }
+.project-list article { display: grid; grid-template-columns: 1fr 125px; gap: 20px; min-height: 0; padding: 24px 0; border-bottom: 1px solid var(--rule); }
+.project-list article > a, .project-list article > span:last-child { font-size: 9px; }
 .project-list article > a, .project-list article > span:last-child { text-align: right; }
 .project-list .github-link { display: inline-grid; width: 28px; height: 28px; place-items: center; justify-self: end; border: 1px solid var(--rule); color: var(--ink); }
 .project-list .github-link svg { width: 14px; height: 14px; fill: currentColor; }
@@ -73,7 +73,7 @@ main { max-width: none; margin: 0; padding: 0 clamp(14px, 3vw, 48px); }
 .personal-list section { display: grid; grid-template-columns: 130px 1fr; gap: 25px; min-height: 220px; padding: 28px 0; border-bottom: 1px solid var(--rule); }
 .personal-list section.featured { min-height: 330px; border-bottom-color: var(--ink); }
 .personal-list section.featured h2 { max-width: 760px; font-size: clamp(32px, 6vw, 64px); }
-.personal-list section.featured a { margin-top: auto; padding: 9px 11px; border: 1px solid var(--ink); font-size: 10px; text-decoration: none; text-transform: uppercase; }
+.personal-list section.featured a { margin-top: 20px; padding: 9px 11px; border: 1px solid var(--ink); font-size: 10px; text-decoration: none; text-transform: uppercase; }
 .personal-list section.featured a:hover { background: var(--ink); color: var(--bg); }
 .personal-list section > div { display: flex; flex-direction: column; align-items: flex-start; }
 .personal-list h2 { margin-top: 0; }
