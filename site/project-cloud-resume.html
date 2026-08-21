@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Details, screenshots, and source code for murta.xyz and the Cloud Resume project.">
+  <title>Cloud Resume - murta</title>
+  <script src="assets/js/theme-init.js"></script>
+  <link rel="stylesheet" href="assets/css/personal.css">
+  <link rel="stylesheet" href="assets/css/project-detail.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="site-name" href="index.html">murta.xyz</a>
+    <nav aria-label="Primary navigation"><a href="index.html">Me</a><a class="active" href="projects.html">Projects</a><a href="personal.html">Personal</a></nav>
+    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme"></button></div>
+  </header>
+  <main class="project-detail">
+    <a class="project-back" href="projects.html">← All projects</a>
+    <header class="project-hero">
+      <p class="status">ACTIVE / 2026</p>
+      <h1>murta.xyz / Cloud Resume</h1>
+      <p class="summary">A static portfolio on AWS with serverless features, infrastructure as code, and automated deployment pipelines.</p>
+      <ul class="tags"><li>AWS</li><li>Terraform</li><li>Python</li><li>GitHub Actions</li><li>Vanilla JS</li></ul>
+      <div class="project-links"><a href="https://github.com/plaaxer/cloud-challenge" target="_blank" rel="noreferrer">View on GitHub ↗</a></div>
+    </header>
+    <section class="project-copy">
+      <h2>The site</h2>
+      <div><p>This portfolio is the product as well as its own technical case study. The frontend is deliberately small—semantic HTML, a shared responsive CSS system, and dependency-free JavaScript for navigation, theme selection, posts, comments, and the live visitor count. That keeps the pages fast, inspectable, and usable without a client framework.</p><p>The visual system supports light and dark themes, adapts from mobile to wide displays, and uses a compact editorial layout across the profile, projects, personal notes, calculator, and project-detail pages.</p></div>
+    </section>
+    <section class="project-copy">
+      <h2>Serverless backend</h2>
+      <div><p>An API Gateway HTTP API invokes Python 3.12 Lambda functions. The visitor endpoint atomically increments a DynamoDB counter, so concurrent visits do not overwrite one another. A second Lambda powers posts and comments in a DynamoDB single-table design with point-in-time recovery enabled.</p><p>Public readers can retrieve posts and add comments; publishing, editing, and deletion routes require a Cognito-issued JWT. Comment creation is throttled at the gateway, Lambda errors go to CloudWatch, and IAM policies limit each function to the DynamoDB actions it actually needs.</p></div>
+    </section>
+    <section class="project-copy">
+      <h2>Infrastructure</h2>
+      <div><p>Terraform defines the API, integrations, routes, DynamoDB tables, Lambda packages, permissions, logging, and authentication. Remote state is encrypted in S3, while pay-per-request tables keep the operational footprint appropriate for a personal site. The API's browser access is restricted to <code>murta.xyz</code>.</p><p>The result extends the original Cloud Resume Challenge beyond a static résumé: it is now a small publishing platform and portfolio whose application code and cloud resources remain versioned together.</p></div>
+    </section>
+    <dl class="project-facts"><div><dt>Runtime</dt><dd>Static HTML/CSS/JS · Python 3.12 Lambda</dd></div><div><dt>Data &amp; API</dt><dd>DynamoDB · API Gateway HTTP API</dd></div><div><dt>Security &amp; operations</dt><dd>Cognito JWT · least-privilege IAM · CloudWatch</dd></div></dl>
+  </main>
+  <footer><span>Felipe Murta / Brazil</span><a href="projects.html">all projects</a><a href="https://github.com/plaaxer/cloud-challenge" target="_blank" rel="noreferrer">github ↗</a></footer>
+  <script src="assets/js/counter.js"></script>
+  <script src="assets/js/theme.js"></script>
+</body>
+</html>

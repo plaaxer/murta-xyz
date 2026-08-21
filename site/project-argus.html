@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A retrospective and technical overview of Argus Password Manager.">
+  <title>Argus Password Manager - murta</title>
+  <script src="assets/js/theme-init.js"></script>
+  <link rel="stylesheet" href="assets/css/personal.css">
+  <link rel="stylesheet" href="assets/css/project-detail.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="site-name" href="index.html">murta.xyz</a>
+    <nav aria-label="Primary navigation"><a href="index.html">Me</a><a class="active" href="projects.html">Projects</a><a href="personal.html">Personal</a></nav>
+    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme"></button></div>
+  </header>
+  <main class="project-detail">
+    <a class="project-back" href="projects.html">← All projects</a>
+    <header class="project-hero">
+      <p class="status">LEARNING PROJECT / 2024</p>
+      <h1>Argus Password Manager</h1>
+      <p class="summary">A self-hosted password manager—and an honest study of cryptography, databases, APIs, and the architectural consequences of where encryption happens.</p>
+      <ul class="tags"><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>Cryptography</li><li>Docker</li></ul>
+      <div class="project-links"><a href="https://github.com/plaaxer/argus-password-manager" target="_blank" rel="noreferrer">View on GitHub ↗</a></div>
+    </header>
+    <section class="project-copy project-retrospective">
+      <h2>Retrospective / disclaimer</h2>
+      <div>
+        <p>I started the password manager as one of my first non-university projects back in early 2024. Choosing what kind of project I would do took some time; I wanted something non-trivial and useful, but not too complex for me to manage. There were also other factors, I'm sure, as I kept watching videos about what kind of project to do for some months before I actually started coding.</p>
+        <p>In any case, I had a few objectives in mind when I decided on a password manager. Firstly, I wanted to learn cryptography well and work with binaries. That was certainly a success - ingrained in my mind are all the salting and Base64 issues I had to face when developing the encryption algorithm. Looking back at it, the crypto module was the only thing there that was actually useful, mostly due to its simplicity. After all, the Fernet object from Cryptography (the Python library) did almost all of the job, so there was not that much room for mistakes. Secondly, I wanted to learn SQL, more specifically PostgreSQL. I wouldn't say it was a complete success, but given that LLMs at the time were sub-optimal, I had to manually write a ton of boilerplate SQL code to be run by psycopg2, so it made it easier for me to re-learn SQL at college a few semesters later. I did make a lot of architecturally questionable choices, however, such as using Postgres stashes as a per-user division (which I later, naturally, removed). It was also a concern of mine to try and "protect" each stash independently, even though the data inside was already encrypted - some type of <em>double-layer security</em> I had in mind. Due to my inexperienced self, the fact that a superuser could just access any table arbitrarily made me concerned.</p>
+        <p>Well, most of these initial, problematic decisions I eventually fixed. What sealed the death sentence of this project were two factors, one relating to the other: (1) it was a CLI application in Python, and no one, <em>not even myself</em>, wants to use a CLI, especially nowadays when you can just vibe-code a frontend; and (2) because I don't want to touch Tkinter, PyQt, or any Python GUI framework, for any frontend I try to implement - unless I turn the Python application into a sidecar to some Tauri frontend with a SQLite database, absolutely destroying my current Docker setup - the only logical way to connect to the backend is through an API. That was the main reason why I added FastAPI to it and decided to create a small GUI frontend. And then comes the main problem: the encryption, because it was originally designed to be a CLI application, happens server-side, so any kind of non-HTTPS traffic could be intercepted and credentials - the master password - stolen. And from there it was doomed - the client-server setup just won't work with the current stack.</p>
+        <p>Technically, it is still usable. You can use an older version through the CLI, or just use my vibe-coded frontend with <em>unsafe</em> HTTP. If you have a sniffer reading your packets locally and intercepting the master password, you might have bigger problems than some random password manager's safety. Well, needless to say, this is just a small project for learning. There are whole companies with cybersecurity specialists and intricate architectural designs that provide password managers, and they are probably more trustworthy than whatever this is. That being said, this is as simple as it gets. Just a small symmetric encryption algorithm, and complexity is not really ideal when it comes to security.</p>
+      </div>
+    </section>
+    <section class="project-copy">
+      <h2>Current implementation</h2>
+      <div><p>The current branch exposes an asynchronous FastAPI service for registration, login, and authenticated credential CRUD. PostgreSQL 15 stores users and encrypted password records, JWTs carry sessions, and Docker Compose starts the database and backend with a database health check and persistent volume.</p><p>The master password is never stored directly. Argon2 verifies it at login; for each credential, PBKDF2-HMAC-SHA256 derives a 32-byte key from the master password and a fresh salt using 480,000 iterations. Fernet then provides authenticated symmetric encryption, and the encrypted username, encrypted password, and salt are Base64-encoded for storage.</p></div>
+    </section>
+    <section class="project-copy">
+      <h2>Trust boundary</h2>
+      <div><p>Argus encrypts data at rest, but it is not zero-knowledge: the backend receives the plaintext master password and credential values during requests. Without HTTPS, a network observer can intercept them; even with HTTPS, the user must trust the server handling those secrets.</p><p>For that reason, the repository describes this version as suitable only for localhost or a trusted private network. It should be treated as a learning project and not as a replacement for a professionally audited password manager.</p></div>
+    </section>
+    <dl class="project-facts"><div><dt>Encryption</dt><dd>Fernet · PBKDF2-HMAC-SHA256 · per-entry salts</dd></div><div><dt>Application</dt><dd>FastAPI · JWT · PostgreSQL 15</dd></div><div><dt>Intended environment</dt><dd>Localhost or a trusted HTTPS network</dd></div></dl>
+  </main>
+  <footer><span>Felipe Murta / Brazil</span><a href="projects.html">all projects</a><a href="https://github.com/plaaxer/argus-password-manager" target="_blank" rel="noreferrer">github ↗</a></footer>
+  <script src="assets/js/counter.js"></script>
+  <script src="assets/js/theme.js"></script>
+</body>
+</html>

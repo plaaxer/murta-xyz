@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Details, screenshots, and source code for DLQ-Surgeon.">
+  <title>DLQ-Surgeon - murta</title>
+  <script src="assets/js/theme-init.js"></script>
+  <link rel="stylesheet" href="assets/css/personal.css">
+  <link rel="stylesheet" href="assets/css/project-detail.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="site-name" href="index.html">murta.xyz</a>
+    <nav aria-label="Primary navigation"><a href="index.html">Me</a><a class="active" href="projects.html">Projects</a><a href="personal.html">Personal</a></nav>
+    <div class="utility"><span class="counter">visitor/<b data-visitor-count>—</b></span><button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme"></button></div>
+  </header>
+  <main class="project-detail">
+    <a class="project-back" href="projects.html">← All projects</a>
+    <header class="project-hero">
+      <p class="status">ACTIVE / 2026</p>
+      <h1>DLQ-Surgeon</h1>
+      <p class="summary">A RabbitMQ CLI for inspecting, repairing, validating, and safely re-injecting dead-lettered messages.</p>
+      <ul class="tags"><li>Java</li><li>RabbitMQ</li><li>GraalVM</li><li>LangChain4j</li><li>JSON Schema</li></ul>
+      <div class="project-links"><a href="https://github.com/plaaxer/dlq-surgeon" target="_blank" rel="noreferrer">View on GitHub ↗</a></div>
+    </header>
+    <section class="project-copy">
+      <h2>The problem</h2>
+      <div><p>RabbitMQ dead-letter queues often contain recoverable messages: a renamed field, an outdated payload shape, a missing required value, or an event caught by a temporary dependency failure. Repairing one by hand usually means copying JSON out of the management UI, reconstructing its exchange and routing key, and republishing it without introducing a duplicate or losing the original.</p><p>DLQ-Surgeon turns that fragile sequence into one reviewed workflow. Its <code>list</code> and <code>peek</code> commands inspect queues without changing them; <code>fix</code> fetches a message, lets the operator repair it, validates it when a JSON Schema is supplied, and displays the complete reinjection plan before anything is written.</p></div>
+    </section>
+    <section class="project-copy">
+      <h2>Safety model</h2>
+      <div><p>The tool recovers the original destination from the most recent <code>x-death</code> entry, while still allowing an explicit exchange or routing-key override. It publishes the replacement with RabbitMQ publisher confirms and acknowledges the source message only after the broker confirms the new copy. If editing, validation, publication, or confirmation fails, the DLQ message remains untouched.</p><p>Operators can enforce read-only mode, preserve the full death history by default, and use named connection profiles. The repair path uses <code>basic.get</code> and <code>basic.ack</code> so it removes the exact selected message—even while new messages arrive in the queue.</p></div>
+    </section>
+    <section class="project-copy">
+      <h2>AI assistance</h2>
+      <div><p>With <code>--suggest</code>, an LLM receives the failed payload and its JSON Schema and proposes a schema-aware repair. The suggestion is presented as a unified diff: the operator can accept it, edit it, reject it in favor of the original, or abort. A final repair-plan confirmation remains mandatory unless deliberately bypassed for automation.</p><p>The optional LangChain4j module supports Anthropic, OpenAI, Gemini, Ollama, and OpenAI-compatible endpoints. The core, CLI, and AI concerns live in separate Maven modules, and releases include both a Java 21 fat JAR and a GraalVM native executable.</p></div>
+    </section>
+    <dl class="project-facts"><div><dt>Commands</dt><dd>list · peek · fix</dd></div><div><dt>Validation</dt><dd>JSON Schema Draft-04 through 2020-12</dd></div><div><dt>Delivery guarantee</dt><dd>Source acknowledged only after publisher confirmation</dd></div></dl>
+  </main>
+  <footer><span>Felipe Murta / Brazil</span><a href="projects.html">all projects</a><a href="https://github.com/plaaxer/dlq-surgeon" target="_blank" rel="noreferrer">github ↗</a></footer>
+  <script src="assets/js/counter.js"></script>
+  <script src="assets/js/theme.js"></script>
+</body>
+</html>
