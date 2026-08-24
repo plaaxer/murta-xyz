@@ -11,6 +11,28 @@
 .project-copy div p { margin: 0 0 20px; color: var(--body-copy); font: clamp(14px, .22vw + 13px, 16px)/1.75 Georgia, serif; }
 .project-copy div p:last-child { margin-bottom: 0; }
 .project-copy h3 { margin: 30px 0 10px; font: 400 11px/1.4 "Courier New", monospace; text-transform: uppercase; }
+.project-diagrams { padding: 55px 0; border-bottom: 1px solid var(--ink); }
+.project-diagrams > header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.project-diagrams > header h2 { margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; }
+.project-diagrams > header p { margin: 0; color: var(--muted); font-size: 9px; }
+.architecture-diagram { margin: 0; padding: clamp(18px, 3vw, 32px); border: 1px solid var(--rule); }
+.architecture-diagram + .architecture-diagram { margin-top: 12px; }
+.architecture-diagram figcaption { margin-bottom: 24px; color: var(--muted); font-size: 9px; text-transform: uppercase; }
+.diagram-flow { display: flex; align-items: center; gap: 12px; }
+.diagram-node { min-width: 122px; padding: 15px 14px; border: 1px solid var(--ink); background: var(--bg); text-align: center; }
+.diagram-node span { display: block; font: 400 11px/1.2 "Courier New", monospace; text-transform: uppercase; }
+.diagram-node small { display: block; margin-top: 6px; color: var(--muted); font-size: 8px; line-height: 1.35; }
+.diagram-arrow { flex: 0 0 auto; color: var(--muted); font: 16px/1 "Courier New", monospace; }
+.diagram-split { flex: 1; display: grid; gap: 12px; }
+.diagram-branch { display: flex; align-items: center; gap: 10px; padding: 10px; border-left: 1px solid var(--rule); background: var(--subnav); }
+.diagram-label { width: 72px; margin: 0; color: var(--muted); font-size: 8px; text-transform: uppercase; }
+.diagram-pair { flex: 1; display: grid; grid-template-columns: repeat(2, minmax(105px, 1fr)); gap: 8px; }
+.diagram-pair .diagram-node { min-width: 0; }
+.diagram-notes { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 8px; }
+.diagram-notes b { color: var(--body-copy); font-weight: 400; text-transform: uppercase; }
+.deployment-flow > .diagram-node { flex: 0 0 145px; }
+.deployment-split .diagram-branch { min-width: 0; }
+.deployment-split .diagram-node { flex: 1; min-width: 0; }
 .project-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 0; border: 1px solid var(--rule); background: var(--rule); }
 .project-facts div { padding: 20px; background: var(--bg); }
 .project-facts dt { margin-bottom: 8px; color: var(--muted); font-size: 9px; text-transform: uppercase; }
@@ -25,4 +47,4 @@
 .gallery-item:first-child .image-placeholder { height: 100%; min-height: 452px; }
 .gallery-item img { display: block; width: 100%; height: 100%; min-height: 220px; border: 1px solid var(--rule); object-fit: cover; }
 .gallery-item figcaption { margin-top: 8px; color: var(--muted); font-size: 9px; }
-@media (max-width: 700px) { .project-copy { grid-template-columns: 1fr; gap: 22px; } .project-facts { grid-template-columns: 1fr; } .gallery-grid { grid-template-columns: 1fr; } .gallery-item:first-child { grid-row: auto; } .gallery-item:first-child .image-placeholder { min-height: 260px; } }
+@media (max-width: 700px) { .project-copy { grid-template-columns: 1fr; gap: 22px; } .project-diagrams > header { display: block; } .project-diagrams > header p { margin-top: 8px; } .diagram-flow, .diagram-branch { align-items: stretch; flex-direction: column; } .diagram-flow > .diagram-arrow, .diagram-branch > .diagram-arrow { transform: rotate(90deg); align-self: center; } .diagram-node, .deployment-flow > .diagram-node { width: 100%; min-width: 0; } .diagram-label { width: auto; } .diagram-pair { width: 100%; grid-template-columns: 1fr; } .diagram-notes { display: grid; } .project-facts { grid-template-columns: 1fr; } .gallery-grid { grid-template-columns: 1fr; } .gallery-item:first-child { grid-row: auto; } .gallery-item:first-child .image-placeholder { min-height: 260px; } }

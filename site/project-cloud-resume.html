@@ -36,6 +36,69 @@
       <h2>Infrastructure</h2>
       <div><p>Terraform defines the API, integrations, routes, DynamoDB tables, Lambda packages, permissions, logging, and authentication. Remote state is encrypted in S3, while pay-per-request tables keep the operational footprint appropriate for a personal site. The API's browser access is restricted to <code>murta.xyz</code>.</p><p>The result extends the original Cloud Resume Challenge beyond a static résumé: it is now a small publishing platform and portfolio whose application code and cloud resources remain versioned together.</p></div>
     </section>
+    <section class="project-diagrams" aria-labelledby="architecture-title">
+      <header>
+        <h2 id="architecture-title">AWS architecture</h2>
+        <p>Two paths, one small stack.</p>
+      </header>
+      <figure class="architecture-diagram">
+        <figcaption>01 / Requests</figcaption>
+        <div class="diagram-flow request-flow">
+          <div class="diagram-node diagram-client"><span>Browser</span><small>murta.xyz</small></div>
+          <span class="diagram-arrow" aria-hidden="true">→</span>
+          <div class="diagram-split">
+            <div class="diagram-branch">
+              <p class="diagram-label">Static site</p>
+              <div class="diagram-node"><span>CloudFront</span><small>CDN + HTTPS</small></div>
+              <span class="diagram-arrow" aria-hidden="true">→</span>
+              <div class="diagram-node"><span>S3</span><small>HTML / CSS / JS</small></div>
+            </div>
+            <div class="diagram-branch diagram-api-branch">
+              <p class="diagram-label">Serverless API</p>
+              <div class="diagram-node"><span>API Gateway</span><small>HTTP API + JWT</small></div>
+              <span class="diagram-arrow" aria-hidden="true">→</span>
+              <div class="diagram-pair">
+                <div class="diagram-node"><span>Lambda</span><small>visitor count</small></div>
+                <div class="diagram-node"><span>Lambda</span><small>posts + comments</small></div>
+              </div>
+              <span class="diagram-arrow" aria-hidden="true">→</span>
+              <div class="diagram-pair">
+                <div class="diagram-node"><span>DynamoDB</span><small>counter table</small></div>
+                <div class="diagram-node"><span>DynamoDB</span><small>content table</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="diagram-notes">
+          <span><b>Cognito</b> authorizes write routes</span>
+          <span><b>CloudWatch</b> receives Lambda logs</span>
+          <span><b>IAM</b> limits table access per function</span>
+        </div>
+      </figure>
+      <figure class="architecture-diagram deployment-diagram">
+        <figcaption>02 / Deployment</figcaption>
+        <div class="diagram-flow deployment-flow">
+          <div class="diagram-node"><span>Git push</span><small>master branch</small></div>
+          <span class="diagram-arrow" aria-hidden="true">→</span>
+          <div class="diagram-node"><span>GitHub Actions</span><small>path-filtered workflows</small></div>
+          <span class="diagram-arrow" aria-hidden="true">→</span>
+          <div class="diagram-split deployment-split">
+            <div class="diagram-branch">
+              <p class="diagram-label">Frontend</p>
+              <div class="diagram-node"><span>S3 sync</span><small>site assets</small></div>
+              <span class="diagram-arrow" aria-hidden="true">→</span>
+              <div class="diagram-node"><span>CloudFront</span><small>cache invalidation</small></div>
+            </div>
+            <div class="diagram-branch">
+              <p class="diagram-label">Backend</p>
+              <div class="diagram-node"><span>Terraform</span><small>fmt / validate / plan</small></div>
+              <span class="diagram-arrow" aria-hidden="true">→</span>
+              <div class="diagram-node"><span>AWS</span><small>apply infrastructure</small></div>
+            </div>
+          </div>
+        </div>
+      </figure>
+    </section>
     <dl class="project-facts"><div><dt>Runtime</dt><dd>Static HTML/CSS/JS · Python 3.12 Lambda</dd></div><div><dt>Data &amp; API</dt><dd>DynamoDB · API Gateway HTTP API</dd></div><div><dt>Security &amp; operations</dt><dd>Cognito JWT · least-privilege IAM · CloudWatch</dd></div></dl>
   </main>
   <footer><span>Felipe Murta / Brazil</span><a href="projects.html">all projects</a><a href="https://github.com/plaaxer/cloud-challenge" target="_blank" rel="noreferrer">github ↗</a></footer>
